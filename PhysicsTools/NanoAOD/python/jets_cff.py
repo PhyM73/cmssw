@@ -587,6 +587,57 @@ corrT1METJetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
     )
 )
 
+##############################################################
+# Take AK8 jets and collect their PF constituents
+###############################################################
+finalJetsAK8PFConstituents = cms.EDProducer("PatJetConstituentPtrSelector",
+    src = fatJetTable.src,
+    cut = cms.string("abs(eta) <= 2.5")
+)
+
+selectedFinalJetsAK8PFConstituents = cms.EDFilter("PATPackedCandidatePtrSelector",
+    src = cms.InputTag("finalJetsAK8PFConstituents", "constituents"),
+    cut = cms.string("")
+)
+
+##############################################################
+# Setup PF candidates table
+##############################################################
+finalPFCandidates = cms.EDProducer("PackedCandidatePtrMerger",
+    src = cms.VInputTag(cms.InputTag("selectedFinalJetsAK8PFConstituents")),
+    skipNulls = cms.bool(True),
+    warnOnSkip = cms.bool(True)
+)
+
+pfCandidatesTable = cms.EDProducer("SimplePATCandidateFlatTableProducer",
+    src = cms.InputTag("finalPFCandidates"),
+    cut = cms.string(""),
+    name = cms.string("PFCand"),
+    doc = cms.string("PF candidate constituents of AK8 puppi jets (FatJet) with |eta| <= 2.5"),
+    singleton = cms.bool(False),
+    extension = cms.bool(False),
+    variables = cms.PSet(
+        pt = Var("pt * puppiWeight()", float, doc="Puppi-weighted pt", precision=10),
+        mass = Var("mass * puppiWeight()", float, doc="Puppi-weighted mass", precision=10),
+        eta = Var("eta", float, precision=12),
+        phi = Var("phi", float, precision=12),
+        pdgId = Var("pdgId", int, doc="PF candidate type (+/-211 = ChgHad, 130 = NeuHad, 22 = Photon, +/-11 = Electron, +/-13 = Muon, 1 = HFHad, 2 = HFEM)")
+  )
+)
+
+##############################################################
+# Setup AK8 jet constituents table
+##############################################################
+finalJetsAK8ConstituentsTable = cms.EDProducer("SimplePatJetConstituentTableProducer",
+    name = cms.string(fatJetTable.name.value()+"PFCand"),
+    candIdxName = cms.string("PFCandIdx"),
+    candIdxDoc = cms.string("Index in the PFCand table"),
+    candidates = pfCandidatesTable.src,
+    jets = fatJetTable.src,
+    jetCut = fatJetTable.cut,
+    jetConstCut = selectedFinalJetsAK8PFConstituents.cut
+)
+
 
 
 ## MC STUFF ######################
@@ -721,7 +772,7 @@ pileupJetId106XUL18=pileupJetId.clone(jets="updatedJets",algos = cms.VPSet(_chsa
 
 
 #before cross linking
-jetSequence = cms.Sequence(jetCorrFactorsNano+updatedJets+tightJetId+tightJetIdLepVeto+bJetVars+qgtagger+jercVars+pileupJetId94X+pileupJetId102X+pileupJetId106XUL16+pileupJetId106XUL16APV+pileupJetId106XUL17+pileupJetId106XUL18+updatedJetsWithUserData+jetCorrFactorsAK8+updatedJetsAK8+tightJetIdAK8+tightJetIdLepVetoAK8+updatedJetsAK8WithUserData+chsForSATkJets+softActivityJets+softActivityJets2+softActivityJets5+softActivityJets10+finalJets+finalJetsAK8)
+jetSequence = cms.Sequence(jetCorrFactorsNano+updatedJets+tightJetId+tightJetIdLepVeto+bJetVars+qgtagger+jercVars+pileupJetId94X+pileupJetId102X+pileupJetId106XUL16+pileupJetId106XUL16APV+pileupJetId106XUL17+pileupJetId106XUL18+updatedJetsWithUserData+jetCorrFactorsAK8+updatedJetsAK8+tightJetIdAK8+tightJetIdLepVetoAK8+updatedJetsAK8WithUserData+chsForSATkJets+softActivityJets+softActivityJets2+softActivityJets5+softActivityJets10+finalJets+finalJetsAK8+finalJetsAK8PFConstituents+selectedFinalJetsAK8PFConstituents)
 
 _jetSequence_2016 = jetSequence.copy()
 _jetSequence_2016.insert(_jetSequence_2016.index(tightJetId), looseJetId)
@@ -762,7 +813,7 @@ for modifier in run2_miniAOD_80XLegacy, run2_nanoAOD_94X2016, run2_nanoAOD_94XMi
 jetLepSequence = cms.Sequence(lepInJetVars)
 
 #after cross linkining
-jetTables = cms.Sequence(bjetNN+cjetNN+jetTable+fatJetTable+subJetTable+saJetTable+saTable)
+jetTables = cms.Sequence(bjetNN+cjetNN+jetTable+fatJetTable+subJetTable+saJetTable+saTable+finalPFCandidates+pfCandidatesTable+finalJetsAK8ConstituentsTable)
 
 #MC only producers and tables
 jetMC = cms.Sequence(jetMCTable+genJetTable+patJetPartons+genJetFlavourTable+genJetAK8Table+genJetAK8FlavourAssociation+genJetAK8FlavourTable+fatJetMCTable+genSubJetAK8Table+subjetMCTable)
