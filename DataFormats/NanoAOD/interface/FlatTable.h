@@ -167,7 +167,10 @@ template<> inline void FlatTable::check_type<uint8_t>(FlatTable::ColumnType type
      if (type != FlatTable::UInt8Column && type != FlatTable::BoolColumn) throw cms::Exception("mismatched type");
 }
 
-
+template<>
+inline FlatTable::ColumnType FlatTable::defaultColumnType<int>() {
+    return FlatTable::IntColumn;
+}
 
 template<> inline const std::vector<float>   & FlatTable::bigVector<float>()   const { return floats_; }
 template<> inline const std::vector<int>     & FlatTable::bigVector<int>()     const { return ints_; }
