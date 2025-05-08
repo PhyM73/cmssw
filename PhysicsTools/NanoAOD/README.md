@@ -26,7 +26,7 @@ cmsDriver.py --python_filename test_nanoTuples_mc2018.py --eventcontent NANOAODS
 
 <!-- 
 ```bash
-cmsDriver.py --python_filename test_nanoTuples_mc2018.py --eventcontent NANOAODSIM --customise PhysicsTools/NanoTuples/nanoTuples_cff.nanoTuples_customizeMC --datatier NANOAODSIM --fileout file:nano_mc2018.root --conditions 106X_upgrade2018_realistic_v16_L1v1 --step NANO --filein /eos/home-f/fameng/analysis/BosonRes/tmp_test_miniaod/2F6CA128-F495-A546-A927-A6FEFFC49C2F.root --era Run2_2018,run2_nanoAOD_106Xv2 --mc -n 50 --customise_commands "process.options.wantSummary = cms.untracked.bool(True)" >& test_mc2018.log
+cmsDriver.py --python_filename test_nanoTuples_mc2018.py --eventcontent NANOAODSIM --customise PhysicsTools/NanoTuples/nanoTuples_cff.nanoTuples_customizeMC --datatier NANOAODSIM --fileout file:nano_mc2018.root --conditions 106X_upgrade2018_realistic_v16_L1v1 --step NANO --filein file:/eos/home-f/fameng/analysis/BosonRes/tmp_test_miniaod/2F6CA128-F495-A546-A927-A6FEFFC49C2F.root --era Run2_2018,run2_nanoAOD_106Xv2 --mc -n 50 --customise_commands "process.options.wantSummary = cms.untracked.bool(True)" >& test_mc2018.log
 ``` 
 -->
 
